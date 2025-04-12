@@ -1,14 +1,33 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { FiSend, FiUser, FiVideo, FiMoreVertical, FiSmile } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiSend, FiUser, FiVideo, FiMoreVertical, FiSmile, FiMoon, FiSun } from 'react-icons/fi';
+import { useTheme } from './context/ThemeContext'; // Add this import
+import Profile from './components/Profile/Profile'; // Add this import
 
 const App = () => {
+  const { theme, toggleTheme } = useTheme(); // Add this line
   const [messages, setMessages] = useState([
     { id: 1, text: 'Hey there! 👋', sender: 'them', time: '10:30 AM' },
     { id: 2, text: 'Hi! Ready for our meeting?', sender: 'me', time: '10:31 AM' },
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [onlineUsers, setOnlineUsers] = useState(['Alex', 'Jordan', 'Taylor']);
+
+  // Add these theme classes to your main div
+  const themeClasses = {
+    light: 'bg-white text-gray-800',
+    dark: 'bg-gray-900 text-gray-100'
+  };
+
+  const messageClasses = {
+    light: {
+      me: 'bg-blue-500 text-white',
+      them: 'bg-white text-gray-800 shadow'
+    },
+    dark: {
+      me: 'bg-blue-600 text-white',
+      them: 'bg-gray-800 text-gray-100'
+    }
+  };
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -23,53 +42,54 @@ const App = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      {/* Sidebar - Similar to WhatsApp */}
-      <div className="w-80 border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-800">Chats</h1>
+    <div className={`flex h-screen ${themeClasses[theme]}`}>
+      {/* Theme Toggle Button - Add this */}
+      <button 
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-50 p-2 rounded-full bg-opacity-80 backdrop-blur-sm"
+        aria-label="Toggle theme"
+      >
+        {theme === 'light' ? <FiMoon className="text-gray-700" /> : <FiSun className="text-yellow-300" />}
+      </button>
+
+      {/* Sidebar */}
+      <div className={`w-80 border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex flex-col`}>
+        <div className={`p-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+          <h1 className="text-xl font-semibold">Chats</h1>
         </div>
         
         <div className="flex-1 overflow-y-auto">
           {onlineUsers.map(user => (
-            <div key={user} className="p-3 flex items-center hover:bg-gray-50 cursor-pointer">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                <FiUser className="text-blue-500" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">{user}</p>
-                <p className="text-xs text-gray-500">Online</p>
-              </div>
+            <div 
+              key={user} 
+              className={`p-3 flex items-center ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'} cursor-pointer`}
+              onClick={() => {/* Add profile click handler */}}
+            >
+              <Profile username={user} compact /> {/* Replace user bubble with Profile component */}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Main Chat Area - Google Meet inspired */}
+      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+        <div className={`p-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} flex justify-between items-center`}>
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-              <FiUser className="text-green-500" />
-            </div>
-            <div>
-              <h2 className="font-medium">Group Chat</h2>
-              <p className="text-xs text-gray-500">3 participants</p>
-            </div>
+            <Profile username="Group Chat" compact showParticipants />
           </div>
           <div className="flex space-x-4">
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <FiVideo className="text-gray-600" />
+            <button className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
+              <FiVideo className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <FiMoreVertical className="text-gray-600" />
+            <button className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
+              <FiMoreVertical className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
             </button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+        <div className={`flex-1 p-4 overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
           {messages.map(msg => (
             <div 
               key={msg.id} 
@@ -78,13 +98,13 @@ const App = () => {
               <div 
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                   msg.sender === 'me' 
-                    ? 'bg-blue-500 text-white rounded-br-none' 
-                    : 'bg-white text-gray-800 rounded-bl-none shadow'
+                    ? `${messageClasses[theme].me} rounded-br-none` 
+                    : `${messageClasses[theme].them} rounded-bl-none ${theme === 'light' ? 'shadow' : ''}`
                 }`}
               >
                 <p>{msg.text}</p>
                 <p className={`text-xs mt-1 ${
-                  msg.sender === 'me' ? 'text-blue-100' : 'text-gray-500'
+                  msg.sender === 'me' ? 'text-blue-100' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                 }`}>
                   {msg.time}
                 </p>
@@ -93,10 +113,10 @@ const App = () => {
           ))}
         </div>
 
-        {/* Message Input - Hybrid design */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        {/* Message Input */}
+        <div className={`p-4 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
           <div className="flex items-center">
-            <button className="p-2 text-gray-500 hover:text-gray-700">
+            <button className={`p-2 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>
               <FiSmile />
             </button>
             <input
@@ -105,7 +125,11 @@ const App = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Type a message..."
-              className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`flex-1 px-4 py-2 rounded-full border ${
+                theme === 'dark' 
+                  ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-600' 
+                  : 'border-gray-300 focus:ring-blue-500'
+              } focus:outline-none focus:ring-2 focus:border-transparent`}
             />
             <button
               onClick={handleSend}
