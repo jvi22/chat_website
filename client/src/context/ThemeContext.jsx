@@ -1,3 +1,4 @@
+// src/context/ThemeContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
@@ -6,7 +7,6 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    // Get saved theme from localStorage or user profile
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -17,11 +17,6 @@ export const ThemeProvider = ({ children }) => {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
-    
-    // Update user preference in backend if logged in
-    if (userIsLoggedIn) {
-      updateUserThemePreference(newTheme);
-    }
   };
 
   return (
