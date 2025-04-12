@@ -1,0 +1,9 @@
+# Set all files to LF in repo, convert to CRLF on checkout
+* text=auto eol=lf
+
+# Explicitly mark binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
