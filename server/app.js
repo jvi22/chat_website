@@ -9,8 +9,37 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cookieParser = require('cookie-parser');
 
-// Initialize Express app
+
+// Add these at the top of app.js
+const path = require('path');
+
 const app = express();
+
+// Configure EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../views'));
+
+// Add body parser middleware
+app.use(express.urlencoded({ extended: true }));
+
+// Add route to serve the form
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+// Add route to handle form submission
+app.post('/users', async (req, res) => {
+    try {
+        const User = require('../models/user');
+        const newUser = new User(req.body);
+        await newUser.save();
+        res.redirect('/?success=true');
+    } catch (err) {
+        res.redirect('/?error=' + encodeURIComponent(err.message));
+    }
+});
+// Initialize Express app
+
 const server = http.createServer(app);
 
 // Socket.IO setup with CORS
