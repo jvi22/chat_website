@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiSend, FiUser, FiVideo, FiMoreVertical, FiSmile, FiMoon, FiSun } from 'react-icons/fi';
-import PropTypes from 'prop-types'; // Added for prop validation
+import PropTypes from 'prop-types';
+import { useTheme } from './context/ThemeContext';// Added for prop validation
 
 // Safe component imports with fallbacks
 const SafeProfile = ({ username, compact }) => {
@@ -25,7 +26,7 @@ SafeProfile.propTypes = {
 
 const App = () => {
   // Theme with fallback values
-  const { theme = 'light', toggleTheme = () => {} } = useTheme?.() || {};
+  const { theme = 'light', toggleTheme = () => {} } = useTheme() || {};
 
   // State with validation
   const [messages, setMessages] = useState(() => {
